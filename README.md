@@ -4,11 +4,6 @@
 
 > A next-generation gravity-based strategy game combining the depth of Connect Four, the simplicity of Tic-Tac-Toe, and the replayability of modern competitive board games.
 
-https://img.shields.io/badge/version-1.0-blue
-https://img.shields.io/badge/PWA-Ready-green
-https://img.shields.io/badge/Offline-Supported-orange
-https://img.shields.io/badge/Vanilla-JavaScript-yellow
-
 ---
 
 # 🌟 Overview
@@ -512,10 +507,6 @@ gravity-grid/
 ├── service-worker.js
 │
 ├── manifest.json
-│
-├── icons/
-│   ├── icon-192.png
-│   └── icon-512.png
 │
 └── README.md
 ```
