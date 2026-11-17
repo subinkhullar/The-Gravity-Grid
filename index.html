@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cosmic-nebula" data-color-mode="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="The Gravity Grid by Subin Khullar 😎 — A large-scale configurable gravity-based strategy board game PWA with 7 AI levels, 7 themes, analytics, tournaments, and offline play." />
+  <meta name="theme-color" content="#0d0b1f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Gravity Grid" />
+  <title>The Gravity Grid by Subin Khullar 😎</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%237c3aed'/%3E%3Cstop offset='100%25' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='128' height='128' rx='28' fill='%230d0b1f'/%3E%3Crect x='10' y='10' width='108' height='108' rx='22' fill='none' stroke='url(%23g)' stroke-width='6'/%3E%3Ccircle cx='40' cy='40' r='11' fill='%2306b6d4'/%3E%3Ccircle cx='88' cy='40' r='11' fill='%23f43f5e'/%3E%3Ccircle cx='40' cy='88' r='11' fill='%23f43f5e'/%3E%3Ccircle cx='88' cy='88' r='11' fill='%2306b6d4'/%3E%3Ccircle cx='64' cy='64' r='12' fill='%23fbbf24'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230d0b1f'/%3E%3Ccircle cx='64' cy='64' r='18' fill='%2306b6d4'/%3E%3Ccircle cx='128' cy='64' r='18' fill='%23f43f5e'/%3E%3Ccircle cx='64' cy='128' r='18' fill='%23f43f5e'/%3E%3Ccircle cx='128' cy='128' r='18' fill='%2306b6d4'/%3E%3Ccircle cx='96' cy='96' r='18' fill='%23fbbf24'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- Particle & Celebration Effects Layer -->
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- Toast / Achievement / Reward Notification Stack -->
+  <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- PWA Install Prompt Banner -->
+  <div id="install-banner" class="install-banner hidden" role="region" aria-label="Install Application">
+    <div class="install-banner-content">
+      <span class="install-icon" aria-hidden="true">📲</span>
+      <div>
+        <strong>Install The Gravity Grid</strong>
+        <p>Play offline anytime with full PWA support and instant loading.</p>
+      </div>
+    </div>
+    <div class="install-banner-actions">
+      <button id="btn-install-accept" class="btn btn-primary btn-sm" type="button">Install</button>
+      <button id="btn-install-dismiss" class="btn btn-ghost btn-sm" type="button" aria-label="Dismiss install prompt">✕</button>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <!-- Top Application Header -->
+    <header class="app-header glass-panel">
+      <div class="header-top">
+        <div class="brand">
+          <div class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 48 48" width="38" height="38">
+              <defs>
+                <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="var(--accent-primary)" />
+                  <stop offset="100%" stop-color="var(--accent-secondary)" />
+                </linearGradient>
+              </defs>
+              <rect x="3" y="3" width="42" height="42" rx="11" fill="none" stroke="url(#logoGrad)" stroke-width="3" />
+              <circle cx="15" cy="15" r="4.5" fill="var(--accent-primary)" />
+              <circle cx="33" cy="15" r="4.5" fill="var(--accent-secondary)" />
+              <circle cx="15" cy="33" r="4.5" fill="var(--accent-secondary)" />
+              <circle cx="33" cy="33" r="4.5" fill="var(--accent-primary)" />
+              <circle cx="24" cy="24" r="5" fill="var(--accent-tertiary)" />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>The Gravity Grid <span class="brand-author">by Subin Khullar 😎</span></h1>
+            <p class="brand-tagline" id="header-status-line">15×15 Grid • Connect 4 • Classic Mode</p>
+          </div>
+        </div>
+
+        <div class="header-controls">
+          <!-- Active Profile XP Pill -->
+          <button id="btn-quick-profile" class="profile-pill" type="button" title="View Player Profile & XP">
+            <span class="profile-avatar" id="header-profile-avatar">😎</span>
+            <div class="profile-meta">
+              <span class="profile-name" id="header-profile-name">Commander</span>
+              <div class="profile-xp-row">
+                <span class="profile-level" id="header-profile-level">Lv 1</span>
+                <div class="xp-bar-mini" aria-hidden="true">
+                  <div class="xp-bar-fill" id="header-xp-fill" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </button>
+
+          <!-- Theme Switcher -->
+          <div class="control-group">
+            <label class="sr-only" for="theme-select">Select Visual Theme</label>
+            <select id="theme-select" class="select-compact" aria-label="Select Visual Theme">
+              <option value="cosmic-nebula">🌌 Cosmic Nebula</option>
+              <option value="cyberpunk">⚡ Cyberpunk</option>
+              <option value="ocean-depths">🌊 Ocean Depths</option>
+              <option value="forest-kingdom">🌲 Forest Kingdom</option>
+              <option value="royal-gold">👑 Royal Gold</option>
+              <option value="minimalist">◻️ Minimalist</option>
+              <option value="neon-matrix">🟢 Neon Matrix</option>
+            </select>
+          </div>
+
+          <!-- Dark / Light Mode Toggle -->
+          <button id="btn-color-mode" class="btn btn-icon glass-btn" type="button" title="Toggle Dark/Light Theme" aria-label="Toggle Dark or Light Mode">
+            <span id="color-mode-icon">🌙</span>
+          </button>
+
+          <!-- Audio Toggle -->
+          <button id="btn-sound-toggle" class="btn btn-icon glass-btn" type="button" title="Toggle Sound Effects" aria-label="Toggle Sound Effects" aria-pressed="true">
+            <span id="sound-icon">🔊</span>
+          </button>
+
+          <!-- Header PWA Install Button -->
+          <button id="btn-header-install" class="btn btn-secondary btn-sm hidden" type="button">
+            📲 Install
+          </button>
+        </div>
+      </div>
+
+      <!-- Primary Navigation Tabs -->
+      <nav class="main-nav" aria-label="Primary Navigation">
+        <div class="nav-tabs" role="tablist">
+          <button id="tab-play" class="nav-tab active" role="tab" aria-selected="true" aria-controls="view-play" data-view="play" type="button">
+            <span aria-hidden="true">🎮</span> Play Arena
+          </button>
+          <button id="tab-setup" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-setup" data-view="setup" type="button">
+            <span aria-hidden="true">⚙️</span> Game Setup
+          </button>
+          <button id="tab-analytics" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-analytics" data-view="analytics" type="button">
+            <span aria-hidden="true">📊</span> Analytics
+          </button>
+          <button id="tab-leaderboard" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-leaderboard" data-view="leaderboard" type="button">
+            <span aria-hidden="true">🏆</span> Leaderboard &amp; Profiles
+          </button>
+          <button id="tab-achievements" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-achievements" data-view="achievements" type="button">
+            <span aria-hidden="true">🎖️</span> Achievements
+          </button>
+          <button id="tab-history" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-history" data-view="history" type="button">
+            <span aria-hidden="true">🎞️</span> Saved &amp; Replays
+          </button>
+          <button id="tab-help" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-help" data-view="help" type="button">
+            <span aria-hidden="true">📘</span> Help &amp; About
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content Views -->
+    <main id="main-content" class="app-main">
+
+      <!-- ======================================================= -->
+      <!-- VIEW 1: PLAY ARENA                                      -->
+      <!-- ======================================================= -->
+      <section id="view-play" class="view-section active" role="tabpanel" aria-labelledby="tab-play">
+        <div class="arena-layout">
+
+          <!-- Left Sidebar: Turn HUD, Timers, Players & Controls -->
+          <aside class="arena-sidebar">
+            <!-- Turn & Timer Card -->
+            <div class="glass-panel hud-card">
+              <div class="hud-card-header">
+                <span class="badge badge-accent" id="arena-mode-badge">Classic Mode</span>
+                <span class="badge badge-outline" id="arena-rules-badge">15×15 • Connect 4</span>
+              </div>
+
+              <div class="active-turn-box" id="active-turn-box">
+                <div class="turn-avatar" id="turn-player-insignia">X</div>
+                <div class="turn-details">
+                  <span class="turn-label" id="turn-status-label">CURRENT TURN</span>
+                  <strong class="turn-player-name" id="turn-player-name">Player 1</strong>
+                  <span class="turn-subtext" id="turn-player-sub">Human • Move #1</span>
+                </div>
+                <div class="ai-thinking hidden" id="ai-thinking-indicator" aria-live="polite">
+                  <span class="spinner-dot"></span> AI Thinking…
+                </div>
+              </div>
+
+              <!-- Timers -->
+              <div class="timers-grid" id="timers-panel">
+                <div class="timer-box" id="turn-timer-box">
+                  <span class="timer-label">Turn Timer</span>
+                  <strong class="timer-value" id="turn-timer-display">00:30</strong>
+                  <div class="timer-progress-track">
+                    <div class="timer-progress-bar" id="turn-timer-bar" style="width: 100%"></div>
+                  </div>
+                </div>
+                <div class="timer-box" id="match-timer-box">
+                  <span class="timer-label">Match Timer</span>
+                  <strong class="timer-value" id="match-timer-display">00:00</strong>
+                  <span class="timer-mode-tag" id="timer-mode-tag">Countdown</span>
+                </div>
+              </div>
+
+              <!-- Mode-Specific Live Banner (Chaos / Sudden Death / Tournament) -->
+              <div class="mode-alert-banner hidden" id="mode-status-banner" aria-live="polite"></div>
+            </div>
+
+            <!-- Action Controls Card -->
+            <div class="glass-panel hud-card">
+              <h2 class="panel-subtitle">Match Controls</h2>
+              <div class="controls-grid">
+                <button id="btn-new-game" class="btn btn-primary btn-sm" type="button">🆕 New Game</button>
+                <button id="btn-pause-resume" class="btn btn-secondary btn-sm" type="button">⏸️ Pause</button>
+                <button id="btn-undo" class="btn btn-ghost btn-sm" type="button" disabled>↩️ Undo</button>
+                <button id="btn-redo" class="btn btn-ghost btn-sm" type="button" disabled>↪️ Redo</button>
+                <button id="btn-save-game" class="btn btn-ghost btn-sm" type="button">💾 Save</button>
+                <button id="btn-hint" class="btn btn-ghost btn-sm" type="button">💡 AI Hint</button>
+                <button id="btn-reset-game" class="btn btn-danger-outline btn-sm" type="button">🔄 Reset</button>
+                <button id="btn-go-setup" class="btn btn-ghost btn-sm" type="button">⚙️ Configure</button>
+              </div>
+            </div>
+
+            <!-- Players Roster -->
+            <div class="glass-panel hud-card">
+              <div class="panel-header-row">
+                <h2 class="panel-subtitle">Players Roster</h2>
+                <span class="text-muted text-xs" id="roster-team-indicator">Free-for-All</span>
+              </div>
+              <ul id="players-roster" class="players-roster"></ul>
+            </div>
+          </aside>
+
+          <!-- Center Stage: Interactive Gravity Grid -->
+          <div class="arena-board-stage glass-panel">
+            <div class="board-toolbar">
+              <div class="board-telemetry">
+                <span>Moves: <strong id="telemetry-moves">0</strong></span>
+                <span>Empty Cells: <strong id="telemetry-empty">225</strong></span>
+                <span>Win Target: <strong id="telemetry-connect">4</strong></span>
+              </div>
+              <div class="board-zoom-controls">
+                <button id="btn-toggle-coords" class="btn btn-ghost btn-xs" type="button" title="Toggle Column Numbers">#️⃣ Cols</button>
+                <button id="btn-toggle-ghost" class="btn btn-ghost btn-xs" type="button" title="Toggle Landing Preview">👁️ Preview</button>
+              </div>
+            </div>
+
+            <!-- Gravity Board Container -->
+            <div class="board-scroll-wrapper" id="board-scroll-wrapper">
+              <div class="board-frame" id="board-frame">
+                <!-- Column Drop Buttons Header -->
+                <div id="column-drop-bar" class="column-drop-bar" role="group" aria-label="Drop column selectors"></div>
+
+                <!-- Main Grid -->
+                <div id="gravity-board" class="gravity-board" role="grid" aria-label="Gravity Grid Game Board"></div>
+              </div>
+            </div>
+
+            <!-- Pause Overlay -->
+            <div id="board-pause-overlay" class="board-overlay hidden" role="dialog" aria-label="Game Paused">
+              <div class="overlay-card glass-panel">
+                <span class="overlay-emoji">⏸️</span>
+                <h3>Game Paused</h3>
+                <p>Timers are halted. Resume whenever you are ready to drop your next piece.</p>
+                <button id="btn-overlay-resume" class="btn btn-primary" type="button">▶️ Resume Match</button>
+              </div>
+            </div>
+
+            <!-- Victory / Draw / Tournament Result Overlay -->
+            <div id="game-result-overlay" class="board-overlay hidden" role="dialog" aria-label="Match Result">
+              <div class="overlay-card glass-panel result-card">
+                <span class="overlay-emoji" id="result-emoji">🏆</span>
+                <h3 id="result-title">Victory!</h3>
+                <p id="result-subtitle">Player 1 connected 4 pieces!</p>
+                <div class="result-stats" id="result-stats-summary"></div>
+                <div class="result-actions">
+                  <button id="btn-result-rematch" class="btn btn-primary" type="button">🔁 Play Again</button>
+                  <button id="btn-result-next-tourney" class="btn btn-secondary hidden" type="button">🏆 Next Tournament Match</button>
+                  <button id="btn-result-replay" class="btn btn-ghost" type="button">🎞️ Watch Replay</button>
+                  <button id="btn-result-close" class="btn btn-ghost" type="button">👁️ Inspect Board</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Sidebar: Live Move Feed & Quick Match Info -->
+          <aside class="arena-feed glass-panel">
+            <div class="panel-header-row">
+              <h2 class="panel-subtitle">Move Telemetry</h2>
+              <span class="badge badge-outline" id="move-feed-count">0 moves</span>
+            </div>
+            <ol id="move-feed" class="move-feed" aria-live="polite"></ol>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- VIEW 2: GAME SETUP & CONFIGURATION                      -->
+      <!-- ======================================================= -->
+      <section id="view-setup" class="view-section" role="tabpanel" aria-labelledby="tab-setup" hidden>
+        <div class="section-header">
+          <div>
+            <h2>Game Configuration Studio</h2>
+            <p class="text-muted">Customize grid dimensions (10×10 to 25×25), up to 8 players, AI levels (1–7), win conditions, timers, and modes.</p>
+          </div>
+          <div class="preset-buttons">
+            <button class="btn btn-ghost btn-sm preset-btn" data-preset="classic" type="button">🎯 Classic 15×15</button>
+            <button class="btn btn-ghost btn-sm preset-btn" data-preset="blitz" type="button">⚡ Blitz 10×10</button>
+            <button class="btn btn-ghost btn-sm preset-btn" data-preset="mega" type="button">🌌 Mega 25×25</button>
+            <button class="btn btn-ghost btn-sm preset-btn" data-preset="ai-war" type="button">🤖 4-AI Showdown</button>
+            <button class="btn btn-ghost btn-sm preset-btn" data-preset="chaos" type="button">🌀 Chaos Rumble</button>
+          </div>
+        </div>
+
+        <div class="setup-grid">
+          <!-- Card 1: Grid & Win Rules -->
+          <div class="glass-panel config-card">
+            <h3>📐 Grid &amp; Win Conditions</h3>
+
+            <div class="form-row">
+              <label for="cfg-rows">Grid Rows: <strong id="cfg-rows-val">15</strong></label>
+              <input id="cfg-rows" type="range" min="10" max="25" value="15" />
+            </div>
+
+            <div class="form-row">
+              <label for="cfg-cols">Grid Columns: <strong id="cfg-cols-val">15</strong></label>
+              <input id="cfg-cols" type="range" min="10" max="25" value="15" />
+            </div>
+
+            <div class="form-row">
+              <label for="cfg-connect-preset">Win Condition (Connect N)</label>
+              <div class="inline-field">
+                <select id="cfg-connect-preset">
+                  <option value="4" selected>Connect 4</option>
+                  <option value="5">Connect 5</option>
+                  <option value="6">Connect 6</option>
+                  <option value="custom">Connect N (Custom)</option>
+                </select>
+                <input id="cfg-connect-n" type="number" min="3" max="12" value="4" aria-label="Custom Connect N Value" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <span class="field-label">Allowed Win Directions</span>
+              <div class="checkbox-grid">
+                <label class="checkbox-pill"><input id="cfg-dir-h" type="checkbox" checked /> Horizontal (—)</label>
+                <label class="checkbox-pill"><input id="cfg-dir-v" type="checkbox" checked /> Vertical (|)</label>
+                <label class="checkbox-pill"><input id="cfg-dir-d" type="checkbox" checked /> Diagonal (\)</label>
+                <label class="checkbox-pill"><input id="cfg-dir-ad" type="checkbox" checked /> Anti-Diagonal (/)</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Game Mode, Teams & Timers -->
+          <div class="glass-panel config-card">
+            <h3>🕹️ Mode, Teams &amp; Timers</h3>
+
+            <div class="form-row">
+              <label for="cfg-mode">Game Mode</label>
+              <select id="cfg-mode">
+                <option value="classic">Classic</option>
+                <option value="sudden-death">Sudden Death (First Blunder / Short Clock)</option>
+                <option value="timed">Timed Blitz</option>
+                <option value="endless">Endless (Score Until Board Full)</option>
+                <option value="tournament">Tournament (Round-Robin / Bracket)</option>
+                <option value="chaos">Chaos Mode (Gravity Shifts &amp; Wild Events)</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="cfg-team-mode">Team Configuration</label>
+              <select id="cfg-team-mode">
+                <option value="none">Free-For-All (No Teams)</option>
+                <option value="2">2 Teams (Alpha vs Omega)</option>
+                <option value="3">3 Teams</option>
+                <option value="4">4 Teams</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="cfg-timer-mode">Timer Mode</label>
+              <select id="cfg-timer-mode">
+                <option value="countdown">Countdown Mode</option>
+                <option value="countup">Count-Up Mode</option>
+                <option value="disabled">Timer Disabled</option>
+              </select>
+            </div>
+
+            <div class="form-row two-col">
+              <div>
+                <label for="cfg-turn-seconds">Per-Turn (sec)</label>
+                <input id="cfg-turn-seconds" type="number" min="5" max="300" value="30" />
+              </div>
+              <div>
+                <label for="cfg-match-minutes">Per-Match (min)</label>
+                <input id="cfg-match-minutes" type="number" min="1" max="120" value="10" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="cfg-ai-depth">AI Lookahead Depth (Levels 5–7): <strong id="cfg-ai-depth-val">3</strong></label>
+              <input id="cfg-ai-depth" type="range" min="1" max="5" value="3" />
+            </div>
+          </div>
+
+          <!-- Card 3: Players & Insignia (2 to 8 Players) -->
+          <div class="glass-panel config-card config-card-wide">
+            <div class="panel-header-row">
+              <h3>👥 Players &amp; Insignia (2–8 Players)</h3>
+              <div class="inline-field">
+                <label for="cfg-player-count">Players:</label>
+                <select id="cfg-player-count">
+                  <option value="2" selected>2 Players</option>
+                  <option value="3">3 Players</option>
+                  <option value="4">4 Players</option>
+                  <option value="5">5 Players</option>
+                  <option value="6">6 Players</option>
+                  <option value="7">7 Players</option>
+                  <option value="8">8 Players</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="player-setup-list" class="player-setup-list"></div>
+
+            <div class="setup-footer-cta">
+              <button id="btn-start-configured-game" class="btn btn-primary btn-lg" type="button">
+                🚀 Launch Gravity Grid Match
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- VIEW 3: ANALYTICS & STATISTICS DASHBOARD                -->
+      <!-- ======================================================= -->
+      <section id="view-analytics" class="view-section" role="tabpanel" aria-labelledby="tab-analytics" hidden>
+        <div class="section-header">
+          <div>
+            <h2>Analytics &amp; Telemetry Dashboard</h2>
+            <p class="text-muted">Live Canvas-rendered performance graphs, win trends, theme usage, and local statistics.</p>
+          </div>
+          <div class="action-row">
+            <button id="btn-refresh-charts" class="btn btn-ghost btn-sm" type="button">🔄 Refresh Charts</button>
+            <button id="btn-export-stats" class="btn btn-secondary btn-sm" type="button">📤 Export JSON</button>
+            <button id="btn-reset-stats" class="btn btn-danger-outline btn-sm" type="button">🗑️ Reset Stats</button>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="kpi-grid" id="stats-kpi-grid">
+          <div class="glass-panel kpi-card">
+            <span class="kpi-label">Games Played</span>
+            <strong class="kpi-value" id="stat-games-played">0</strong>
+          </div>
+          <div class="glass-panel kpi-card">
+            <span class="kpi-label">Wins / Losses / Draws</span>
+            <strong class="kpi-value" id="stat-wld">0 / 0 / 0</strong>
+          </div>
+          <div class="glass-panel kpi-card">
+            <span class="kpi-label">Longest Win Streak</span>
+            <strong class="kpi-value" id="stat-win-streak">0</strong>
+          </div>
+          <div class="glass-panel kpi-card">
+            <span class="kpi-label">Fastest Victory</span>
+            <strong class="kpi-value" id="stat-fastest-win">—</strong>
+          </div>
+          <div class="glass-panel kpi-card">
+            <span class="kpi-label">Avg Move Time</span>
+            <strong class="kpi-value" id="stat-avg-move-time">—</strong>
+          </div>
+          <div class="glass-panel kpi-card">
+            <span class="kpi-label">Most Used Theme</span>
+            <strong class="kpi-value" id="stat-top-theme">Cosmic Nebula</strong>
+          </div>
+          <div class="glass-panel kpi-card">
+            <span class="kpi-label">Most Used Symbol</span>
+            <strong class="kpi-value" id="stat-top-symbol">Classic X</strong>
+          </div>
+          <div class="glass-panel kpi-card">
+            <span class="kpi-label">Top Grid Size</span>
+            <strong class="kpi-value" id="stat-top-grid">15×15</strong>
+          </div>
+        </div>
+
+        <!-- Dynamic Canvas Charts -->
+        <div class="charts-grid">
+          <div class="glass-panel chart-card">
+            <h3>Win / Loss / Draw &amp; AI Difficulty Usage (Bar Chart)</h3>
+            <canvas id="chart-bar" width="520" height="280"></canvas>
+          </div>
+          <div class="glass-panel chart-card">
+            <h3>Theme Usage Distribution (Pie Chart)</h3>
+            <canvas id="chart-pie" width="520" height="280"></canvas>
+          </div>
+          <div class="glass-panel chart-card">
+            <h3>Win Percentage &amp; Historical Trends (Line Graph)</h3>
+            <canvas id="chart-line" width="520" height="280"></canvas>
+          </div>
+          <div class="glass-panel chart-card">
+            <h3>Grid Size Frequency &amp; Symbol Usage</h3>
+            <canvas id="chart-grid-freq" width="520" height="280"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- VIEW 4: LEADERBOARD, PLAYER PROFILES & TOURNAMENT       -->
+      <!-- ======================================================= -->
+      <section id="view-leaderboard" class="view-section" role="tabpanel" aria-labelledby="tab-leaderboard" hidden>
+        <div class="section-header">
+          <div>
+            <h2>Leaderboards, Profiles &amp; Tournaments</h2>
+            <p class="text-muted">Manage local player profiles, inspect rank standings, and track live tournament brackets.</p>
+          </div>
+        </div>
+
+        <div class="two-column-layout">
+          <!-- Player Profiles Manager -->
+          <div class="glass-panel panel-pad">
+            <div class="panel-header-row">
+              <h3>👤 Player Profiles</h3>
+              <button id="btn-create-profile" class="btn btn-primary btn-sm" type="button">➕ New Profile</button>
+            </div>
+            <div id="active-profile-banner" class="active-profile-card"></div>
+            <div id="profiles-list" class="profiles-list"></div>
+          </div>
+
+          <!-- Local Leaderboard -->
+          <div class="glass-panel panel-pad">
+            <div class="panel-header-row">
+              <h3>🏆 Local Leaderboard</h3>
+              <select id="leaderboard-sort" class="select-compact" aria-label="Sort Leaderboard By">
+                <option value="xp">Sort by XP</option>
+                <option value="wins">Sort by Wins</option>
+                <option value="winrate">Sort by Win %</option>
+                <option value="streak">Sort by Best Streak</option>
+              </select>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Player</th>
+                    <th>Rank</th>
+                    <th>Level</th>
+                    <th>W / L / D</th>
+                    <th>Win %</th>
+                    <th>XP</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tournament Tracking Panel -->
+        <div class="glass-panel panel-pad mt-lg">
+          <div class="panel-header-row">
+            <div>
+              <h3>⚔️ Tournament Tracker</h3>
+              <p class="text-muted text-sm">Round-robin tournament standings and scheduled pairings.</p>
+            </div>
+            <button id="btn-start-tournament" class="btn btn-secondary btn-sm" type="button">🏆 Start New Tournament</button>
+          </div>
+          <div id="tournament-panel-body" class="tournament-panel-body"></div>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- VIEW 5: ACHIEVEMENTS, GAMIFICATION & DAILY CHALLENGES   -->
+      <!-- ======================================================= -->
+      <section id="view-achievements" class="view-section" role="tabpanel" aria-labelledby="tab-achievements" hidden>
+        <div class="section-header">
+          <div>
+            <h2>Achievements, Ranks &amp; Daily Challenges</h2>
+            <p class="text-muted">Earn XP, unlock exclusive badges &amp; themes, and complete daily strategic challenges.</p>
+          </div>
+        </div>
+
+        <!-- Gamification Progress Banner -->
+        <div class="glass-panel gamification-hero">
+          <div class="rank-badge-large" id="gamify-rank-icon">🛸</div>
+          <div class="gamify-hero-info">
+            <div class="gamify-top-row">
+              <h3 id="gamify-rank-title">Gravity Initiate</h3>
+              <span class="badge badge-accent" id="gamify-level-badge">Level 1</span>
+            </div>
+            <p class="text-muted text-sm" id="gamify-xp-text">0 / 250 XP to next level</p>
+            <div class="xp-bar-large">
+              <div class="xp-bar-fill" id="gamify-xp-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="gamify-counters">
+            <div><strong id="gamify-unlocked-count">0</strong><span>Badges</span></div>
+            <div><strong id="gamify-challenges-done">0</strong><span>Dailies</span></div>
+          </div>
+        </div>
+
+        <div class="two-column-layout mt-lg">
+          <!-- Daily Challenges -->
+          <div class="glass-panel panel-pad">
+            <div class="panel-header-row">
+              <h3>📅 Daily Challenges</h3>
+              <span class="badge badge-outline" id="daily-reset-timer">Resets Daily</span>
+            </div>
+            <div id="daily-challenges-list" class="challenges-list"></div>
+          </div>
+
+          <!-- Unlockables -->
+          <div class="glass-panel panel-pad">
+            <h3>🔓 Unlockable Perks &amp; Titles</h3>
+            <div id="unlockables-list" class="unlockables-list"></div>
+          </div>
+        </div>
+
+        <!-- Achievements Grid -->
+        <div class="glass-panel panel-pad mt-lg">
+          <div class="panel-header-row">
+            <h3>🎖️ Achievements Vault</h3>
+            <div class="filter-pills">
+              <button class="btn btn-xs btn-primary ach-filter-btn" data-filter="all" type="button">All</button>
+              <button class="btn btn-xs btn-ghost ach-filter-btn" data-filter="unlocked" type="button">Unlocked</button>
+              <button class="btn btn-xs btn-ghost ach-filter-btn" data-filter="locked" type="button">Locked</button>
+            </div>
+          </div>
+          <div id="achievements-grid" class="achievements-grid"></div>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- VIEW 6: SAVED GAMES, HISTORY & MOVE REPLAY              -->
+      <!-- ======================================================= -->
+      <section id="view-history" class="view-section" role="tabpanel" aria-labelledby="tab-history" hidden>
+        <div class="section-header">
+          <div>
+            <h2>Saved Matches, History &amp; Replay Theater</h2>
+            <p class="text-muted">Resume any saved match or inspect past games move-by-move.</p>
+          </div>
+        </div>
+
+        <div class="two-column-layout">
+          <!-- Saved Games -->
+          <div class="glass-panel panel-pad">
+            <h3>💾 Saved Games</h3>
+            <div id="saved-games-list" class="saved-list"></div>
+          </div>
+
+          <!-- Completed Match History -->
+          <div class="glass-panel panel-pad">
+            <div class="panel-header-row">
+              <h3>📜 Match History</h3>
+              <button id="btn-clear-history" class="btn btn-ghost btn-xs" type="button">Clear History</button>
+            </div>
+            <div id="match-history-list" class="saved-list"></div>
+          </div>
+        </div>
+
+        <!-- Replay Theater -->
+        <div id="replay-theater" class="glass-panel panel-pad mt-lg hidden">
+          <div class="panel-header-row">
+            <div>
+              <h3>🎞️ Move Replay Theater</h3>
+              <p class="text-muted text-sm" id="replay-match-meta">Select a match above to replay.</p>
+            </div>
+            <button id="btn-replay-close" class="btn btn-ghost btn-sm" type="button">✕ Close Replay</button>
+          </div>
+
+          <div class="replay-controls">
+            <button id="btn-replay-start" class="btn btn-ghost btn-sm" type="button">⏮️ Start</button>
+            <button id="btn-replay-prev" class="btn btn-ghost btn-sm" type="button">◀️ Step</button>
+            <button id="btn-replay-play" class="btn btn-primary btn-sm" type="button">▶️ Play</button>
+            <button id="btn-replay-next" class="btn btn-ghost btn-sm" type="button">Step ▶️</button>
+            <button id="btn-replay-end" class="btn btn-ghost btn-sm" type="button">End ⏭️</button>
+            <span class="replay-step-counter" id="replay-step-counter">Move 0 / 0</span>
+          </div>
+
+          <div class="replay-board-container">
+            <div id="replay-board" class="gravity-board replay-board"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- VIEW 7: HELP, RULES & ABOUT                             -->
+      <!-- ======================================================= -->
+      <section id="view-help" class="view-section" role="tabpanel" aria-labelledby="tab-help" hidden>
+        <div class="section-header">
+          <div>
+            <h2>Help, Rules &amp; Documentation</h2>
+            <p class="text-muted">Everything you need to master The Gravity Grid by Subin Khullar 😎.</p>
+          </div>
+          <span class="badge badge-accent">Version 1.0.0 PWA</span>
+        </div>
+
+        <div class="help-grid">
+          <article class="glass-panel help-card">
+            <h3>🌌 What is The Gravity Grid?</h3>
+            <p>
+              <strong>The Gravity Grid</strong> is a large-scale gravity-driven strategic board game inspired by Tic-Tac-Toe and Connect Four, engineered for 2 to 8 players across configurable grids from <strong>10×10</strong> up to <strong>25×25</strong>. Unlike free-placement games, gravity dictates every move: pieces always drop to the lowest unoccupied cell in the selected column.
+            </p>
+          </article>
+
+          <article class="glass-panel help-card">
+            <h3>📏 Core Rules &amp; Win Conditions</h3>
+            <ul>
+              <li>Select any non-full column (or press number/arrow keys + Enter) to drop your insignia.</li>
+              <li>Pieces fall under gravity to the lowest open row in that column.</li>
+              <li>Win by aligning <strong>Connect 4, 5, 6, or custom N</strong> pieces along enabled directions: Horizontal, Vertical, Diagonal, or Anti-Diagonal.</li>
+              <li>In <strong>Team Mode</strong>, teammates share victory when any teammate completes a valid line—or build cross-player combos depending on turn strategy.</li>
+            </ul>
+          </article>
+
+          <article class="glass-panel help-card">
+            <h3>🕹️ Game Modes Explained</h3>
+            <ul>
+              <li><strong>Classic:</strong> Standard gravity strategy until a player connects N or the board fills.</li>
+              <li><strong>Sudden Death:</strong> High-stakes blitz clock—running out of time eliminates you or hands victory to the opponent.</li>
+              <li><strong>Timed:</strong> Strict per-turn countdown and overall match timer pressure.</li>
+              <li><strong>Endless:</strong> Every line of N awards points and clears or scores continuously until the grid is completely full; highest score wins!</li>
+              <li><strong>Tournament:</strong> Automated multi-match round-robin standings across participants.</li>
+              <li><strong>Chaos Mode:</strong> Periodic gravity anomalies! Columns can shuffle, bottom rows can compress, or wildcard drops trigger every few turns.</li>
+            </ul>
+          </article>
+
+          <article class="glass-panel help-card">
+            <h3>🤖 AI Difficulty Levels (1–7)</h3>
+            <ul>
+              <li><strong>Level 1 — Random:</strong> Chooses valid columns unpredictably.</li>
+              <li><strong>Level 2 — Basic Strategy:</strong> Takes immediate wins and favors center control.</li>
+              <li><strong>Level 3 — Offensive:</strong> Aggressively builds multi-threat lines and forks.</li>
+              <li><strong>Level 4 — Defensive:</strong> Prioritizes blocking opponent 2-way traps and imminent threats.</li>
+              <li><strong>Level 5 — Minimax:</strong> Alpha-beta pruned lookahead search evaluating future replies.</li>
+              <li><strong>Level 6 — Advanced Heuristic:</strong> Deep positional evaluation of open windows, parity, and trap setups.</li>
+              <li><strong>Level 7 — Adaptive Learning:</strong> Tracks your preferred columns and tactical habits across the session to counter your patterns!</li>
+            </ul>
+          </article>
+
+          <article class="glass-panel help-card">
+            <h3>🏆 Scoring, XP &amp; Achievements</h3>
+            <p>
+              Every move, victory, tournament win, and daily challenge earns <strong>XP</strong>. Level up to climb ranks from <em>Gravity Initiate</em> to <em>Cosmic Grandmaster</em>, unlock exclusive player titles, and collect achievements like <em>First Victory</em>, <em>Fast Thinker</em>, <em>Theme Explorer</em>, and <em>Gravity Scholar</em>.
+            </p>
+          </article>
+
+          <article class="glass-panel help-card">
+            <h3>📊 Statistics, Analytics &amp; Offline PWA</h3>
+            <p>
+              All game saves, profiles, leaderboards, and Canvas telemetry charts are persisted locally in your browser's <code>localStorage</code>. Install The Gravity Grid as a standalone Progressive Web App to play seamlessly offline on desktop or mobile.
+            </p>
+            <p class="text-muted text-sm mt-sm">
+              <strong>Credits:</strong> Designed &amp; architected for <strong>The Gravity Grid by Subin Khullar 😎</strong>. Version 1.0.0.
+            </p>
+          </article>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Application Footer -->
+    <footer class="app-footer glass-panel">
+      <p>Copyright ©️ 2026 Subin Khullar. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- Reusable Profile / Custom Dialog Modal -->
+  <div id="app-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-dialog glass-panel">
+      <div class="modal-header">
+        <h3 id="modal-title">Modal Title</h3>
+        <button id="btn-modal-close" class="btn btn-ghost btn-sm" type="button" aria-label="Close modal">✕</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
